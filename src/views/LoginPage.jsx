@@ -20,7 +20,7 @@ function LoginPage() {
 		setError("");
 		createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
 			.then((userCredential) => {
-				const user = userCredential.user;
+				console.log(userCredential.user);
 			})
 			.catch((error) => {
 				setError(error.message);
@@ -31,7 +31,7 @@ function LoginPage() {
 		setError("");
 		signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
 			.then((userCredential) => {
-				console.log(userCredential)
+				console.log(userCredential.user);
 			})
 			.catch((error) => {
 				setError(error.message);
