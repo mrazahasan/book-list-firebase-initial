@@ -1,7 +1,7 @@
 import FullPageLoader from '../components/FullPageLoader.jsx';
 import { useState } from 'react';
 import { auth } from "../firsbase/config.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 function LoginPage() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -10,7 +10,7 @@ function LoginPage() {
 	const [error, setError] = useState('');
 
 	function handleCredentials(e) {
-		
+
 		setUserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
 		console.log(userCredentials);
 	}
@@ -20,19 +20,22 @@ function LoginPage() {
 		setError("");
 		createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
 			.then((userCredential) => {
-				// Signed up 
 				const user = userCredential.user;
-
 			})
 			.catch((error) => {
-				const errorCode = error.code;
-				const errorMessage = error.message;
 				setError(error.message);
 			});
 	}
 	function handleLogin(e) {
 		e.preventDefault();
-		console.log("login");
+		setError("");
+		signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
+			.then((userCredential) => {
+				console.log(userCredential)
+			})
+			.catch((error) => {
+				setError(error.message);
+			});
 	}
 
 	return (
@@ -71,7 +74,7 @@ function LoginPage() {
 								<button onClick={(e) => handleSignup(e)} className="active btn btn-block">Sign Up</button>
 						}
 						{
-							error && 
+							error &&
 							<div className='error'>
 								{error}
 							</div>
