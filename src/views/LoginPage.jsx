@@ -1,7 +1,9 @@
 import FullPageLoader from '../components/FullPageLoader.jsx';
 import { useState } from 'react';
 import { auth } from "../firsbase/config.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
+import { useDispatch } from 'react-redux';
+import { setUser } from '../store/usersSlice.js';
 
 function LoginPage() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -9,19 +11,26 @@ function LoginPage() {
 	const [userCredentials, setUserCredentials] = useState({});
 	const [error, setError] = useState('');
 
-	function handleCredentials(e) {
+	const dispatch = useDispatch();
 
+	onAuthStateChanged(auth, (user) => {
+		if (user) {
+			const uid = user.uid;
+			dispatch(setUser({ id: user.uid, email: user.email }));
+			
+		} else {
+			dispatch(setUser(null));
+		}
+	});
+
+	function handleCredentials(e) {
 		setUserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
-		console.log(userCredentials);
 	}
 
 	function handleSignup(e) {
 		e.preventDefault();
 		setError("");
 		createUserWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
-			.then((userCredential) => {
-				console.log(userCredential.user);
-			})
 			.catch((error) => {
 				setError(error.message);
 			});
@@ -30,12 +39,16 @@ function LoginPage() {
 		e.preventDefault();
 		setError("");
 		signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
-			.then((userCredential) => {
-				console.log(userCredential.user);
-			})
 			.catch((error) => {
 				setError(error.message);
+				setIsLoading(false);
 			});
+	}
+
+	function handlePasswordReset(e) {
+		const email = prompt("Please enter your email.");
+		sendPasswordResetEmail(auth, email);
+		alert("email sent! Check your inbox for password rest link.")
 	}
 
 	return (
@@ -80,7 +93,7 @@ function LoginPage() {
 							</div>
 						}
 
-						<p className="forgot-password">Forgot Password?</p>
+						<p onClick={(e) => handlePasswordReset(e)} className="forgot-password">Forgot Password?</p>
 
 					</form>
 				</section>
