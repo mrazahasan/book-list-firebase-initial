@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db, auth } from '../firsbase/config';
 
 export const booksSlice = createSlice({
@@ -9,11 +9,11 @@ export const booksSlice = createSlice({
 		status: "idle"
 	},
 	reducers: {
-		addBook: (books, action) => {
-			let newBook = action.payload;
-			newBook.id = books.length ? Math.max(...books.map(book => book.id)) + 1 : 1;
-			books.push(newBook);
-		},
+		// addBook: (books, action) => {
+		// 	let newBook = action.payload;
+		// 	newBook.id = books.length ? Math.max(...books.map(book => book.id)) + 1 : 1;
+		// 	books.push(newBook);
+		// },
 		// eraseBook: (books, action) => {
 		// 	return books.filter(book => book.id != action.payload);
 		// },
@@ -27,7 +27,7 @@ export const booksSlice = createSlice({
 	},
 	extraReducers(builder) {
 		builder
-			.addCase(fetchBooks.pending, (state, action) => {
+			.addCase(fetchBooks.pending, (state) => {
 				state.status = 'loading';
 			})
 			.addCase(fetchBooks.fulfilled, (state, action) => {
@@ -57,10 +57,17 @@ export const booksSlice = createSlice({
 				state.status = 'failed';
 				console.log(action.error.message);
 			})
+			.addCase(addBook.fulfilled, (state, action) => {
+				state.books.push(action.payload);
+			})
+			.addCase(addBook.rejected, (state, action) => {
+				state.status = 'failed';
+				console.log(action.error.message);
+			})
 	}
 })
 
-export const { addBook } = booksSlice.actions;
+// export const { addBook } = booksSlice.actions;
 
 export const selectBooks = state => state.books;
 
@@ -87,6 +94,15 @@ export const toggleRead = createAsyncThunk("books/toggleRead", async (payload) =
 		isRead: !payload.isRead
 	});
 	return payload.id;
+});
+
+export const addBook = createAsyncThunk("books/addBook", async (payload) => {
+	let newBook = payload;
+	newBook.user_id = auth.currentUser.uid;
+	// Add a new document with a generated id.
+	const book = await addDoc(collection(db, "books"), newBook);
+	newBook.id = book.id;
+	return newBook;
 });
 
 export const eraseBook = createAsyncThunk("books/eraseBook", async (payload) => {
