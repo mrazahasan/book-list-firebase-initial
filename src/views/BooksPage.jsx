@@ -3,6 +3,7 @@ import Header from '../components/Header.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchBooks, selectBooks } from '../store/booksSlice.js';
+import { Link } from 'react-router-dom';
 
 
 function BooksPage() {
@@ -26,9 +27,7 @@ function BooksPage() {
 				<Header pageTitle={pageTitle} />
 				<div className="books-container">
 					{
-						booksStatus == "loading" ?
-							"Loading..."
-							:
+						books.length ?
 
 							<div className="books-list">
 
@@ -38,7 +37,14 @@ function BooksPage() {
 
 								)}
 
-							</div>
+							</div> :
+							booksStatus == "loading" ?
+								<div>
+									<p>Loading...</p>
+								</div> :
+								<div>
+									<p>Your book list is empty, <Link to="/add-book">click here</Link> to add new book.</p>
+								</div>
 					}
 				</div>
 			</div>

@@ -92,10 +92,22 @@ function SingleBookPage() {
 						<Notes bookId={id} />
 					</div>
 
-					:
+					: fetchStatus === "success" ?
 
 					<div>
 						<p>Book not found. Click the button above to go back to the list of books.</p>
+					</div>
+
+					: fetchStatus === "error" ?
+
+					<div>
+						<p>Error fetching book</p>
+					</div>
+
+					:
+
+					<div>
+						<p>Loading...</p>
 					</div>
 
 				}
