@@ -7,7 +7,7 @@ import { db } from '../firsbase/config.js';
 
 function Notes({ bookId }) {
 
-	const dispatch = useDispatch();
+	// const dispatch = useDispatch();
 
 	const handleEraseNote = async (id) => {
 		if (confirm('Are you sure you want to erase this note?')) {
